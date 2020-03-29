@@ -5,6 +5,13 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>ProyectoPloc</name>
   
+  <repositories>
+  	<repository>
+  		<id>jitpack.io</id>
+  		<url>https://jitpack.io</url>
+  	</repository>
+  </repositories>
+  
   <dependencies>
   	<!-- https://mvnrepository.com/artifact/io.vertx/vertx-core -->
 	<dependency>
@@ -18,6 +25,21 @@
     	<artifactId>vertx-web</artifactId>
     	<version>3.8.5</version>
 	</dependency>
+	<dependency>
+		<groupId>io.vertx</groupId>
+		<artifactId>vertx-mysql-client</artifactId>
+		<version>3.8.5</version>
+	</dependency>
+	<dependency>
+		<groupId>io.vertx</groupId>
+		<artifactId>vertx-web-client</artifactId>
+		<version>3.8.5</version>
+	</dependency>
+	<dependency>
+		<groupId>com.github.flicus</groupId>
+		<artifactId>vertx-telegram-bot-api</artifactId>
+		<version>1.0.3</version>
+	</dependency>	
   </dependencies>
   <properties>
 	<maven.compiler.source>1.8</maven.compiler.source>
