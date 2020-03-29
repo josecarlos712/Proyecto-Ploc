@@ -15,9 +15,6 @@ public class MainServer extends AbstractVerticle{
 			r.response().end("<h1>Bienvenido al servidor de pruebas</h1> Si esta viendo esto, es porque pertenece al proyecto PLOC, en caso"
 					+ "contrario, vuelvase por donde ha venido :D");
 			
-			//Segunda prueba
-			
-			//Linea añadida por JC
 		}).listen(8085, result -> {
 			if(result.succeeded()) {
 				startFuture.complete();
@@ -27,7 +24,5 @@ public class MainServer extends AbstractVerticle{
 		});
 		
 	}
-	
-	//Esta es la linea de Placix5
 
 }
