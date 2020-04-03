@@ -42,6 +42,7 @@ public class DataBaseVerticle extends AbstractVerticle{
 		
 		router.get("/api/drones").handler(this::getAllDrones);
 		router.get("/api/drones/:idDron").handler(this::getDonByDronID);
+		router.post("/api/drones").handler(this::postDrone);
 		router.delete("/api/drones/:idDron").handler(this::deleteDronByDronID);
 		
 		//-----------------------------------------------------------------TABLA SENSORES------------------------------------------------------------
@@ -118,6 +119,24 @@ public class DataBaseVerticle extends AbstractVerticle{
 				context.response().setStatusCode(401).putHeader("content-type", "application/json").end(JsonObject.mapFrom(res.cause()).encodePrettily());
 			}
 		});
+	}
+	
+	private void postDrone(RoutingContext context) {
+		
+		JsonObject body = context.getBodyAsJson();
+		dataBase.query("INSERT INTO proyecto_ploc.drones values " + body.getInteger("idDron") + "," + body.getInteger("pesoSoportado") + ",null," + "GARAJE," 
+		+ body.getString("parkingPath") + "," + body.getInteger("idSensor") + "," + body.getInteger("idRuta"), res -> {
+			
+			if(res.succeeded()) {
+				System.out.println("Se ha añadido la línea con éxito :D");
+				context.response().setStatusCode(201).putHeader("content-type", "application/json").end(body.encodePrettily());
+			}else {
+				System.out.println("Algo ha salido mal :(");
+				context.response().setStatusCode(401).putHeader("content-type", "application/json").end(JsonObject.mapFrom(res.cause()).encodePrettily());
+			}
+			
+		});
+		
 	}
 	
 	//-----------------------------------------------------------------TABLA SENSORES------------------------------------------------------------
