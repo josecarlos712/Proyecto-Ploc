@@ -34,10 +34,13 @@ public class DataBaseVerticle extends AbstractVerticle{
 				startPromise.fail(result.cause());
 			}
 		});
-		router.get("/api/sensores/:idSensor").handler(this::getValueBySensorID);
+		
+		//router.put("/api/sensores").handler(this::putValue);
+		router.get("/api/sensores/:idSensor").handler(this::getSensorBySensorID);
+		//router.delete("/api/sensores/:idSensor").handler(this::deleteAllBySensorID);
 	}
 	
-	private void getValueBySensorID (RoutingContext context) {
+	private void getSensorBySensorID (RoutingContext context) {
 		
 		dataBase.query("SELECT * FROM proyecto_ploc.sensores_proximidad WHERE id_sensor_prox = " + context.request().getParam("idSensor"), res -> {
 			if(res.succeeded()) {

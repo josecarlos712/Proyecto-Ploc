@@ -5,7 +5,7 @@ public class Dron {
 	private int idDron;
 	private int pesoSoportado;
 	private int bateria;
-	private String estao;
+	private String estado;
 	private String parkingPath;
 	private int idSensor;
 	private int idRuta;	
@@ -20,7 +20,7 @@ public class Dron {
 		this.idDron = idDron;
 		this.pesoSoportado = pesoSoportado;
 		this.bateria = bateria;
-		this.estao = estao;
+		this.estado = estao;
 		this.parkingPath = parkingPath;
 		this.idSensor = idSensor;
 		this.idRuta = idRuta;
@@ -51,11 +51,11 @@ public class Dron {
 	}
 
 	public String getEstao() {
-		return estao;
+		return estado;
 	}
 
 	public void setEstao(String estao) {
-		this.estao = estao;
+		this.estado = estao;
 	}
 
 	public String getParkingPath() {
@@ -87,7 +87,7 @@ public class Dron {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + bateria;
-		result = prime * result + ((estao == null) ? 0 : estao.hashCode());
+		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
 		result = prime * result + idDron;
 		result = prime * result + idRuta;
 		result = prime * result + idSensor;
@@ -107,10 +107,10 @@ public class Dron {
 		Dron other = (Dron) obj;
 		if (bateria != other.bateria)
 			return false;
-		if (estao == null) {
-			if (other.estao != null)
+		if (estado == null) {
+			if (other.estado != null)
 				return false;
-		} else if (!estao.equals(other.estao))
+		} else if (!estado.equals(other.estado))
 			return false;
 		if (idDron != other.idDron)
 			return false;
@@ -131,7 +131,7 @@ public class Dron {
 	@Override
 	public String toString() {
 		return "Drones [idDron=" + idDron + ", pesoSoportado=" + pesoSoportado + ", bateria=" + bateria + ", estao="
-				+ estao + ", parkingPath=" + parkingPath + ", idSensor=" + idSensor + ", idRuta=" + idRuta + "]";
+				+ estado + ", parkingPath=" + parkingPath + ", idSensor=" + idSensor + ", idRuta=" + idRuta + "]";
 	}
 	
 	
