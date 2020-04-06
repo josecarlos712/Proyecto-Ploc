@@ -45,10 +45,10 @@ public class DataBaseVerticle extends AbstractVerticle{
 		router.route("/api/drones/*").handler(BodyHandler.create());
 		
 		router.get("/api/drones").handler(this::getAllDrones);
-		router.get("/api/drones/:idDron").handler(this::getDonByDronID);
+		router.get("/api/drones/:idDron").handler(this::getDroneByDroneID);
 		router.post("/api/drones").handler(this::postDrone);
 		router.put("/api/drones/:idDron").handler(this::putDrone);
-		router.delete("/api/drones/:idDron").handler(this::deleteDronByDronID);
+		router.delete("/api/drones/:idDron").handler(this::deleteDroneByDroneID);
 		
 		//-----------------------------------------------------------------TABLA SENSORES------------------------------------------------------------
 		
@@ -105,7 +105,7 @@ public class DataBaseVerticle extends AbstractVerticle{
 		
 	}
 	
-	private void getDonByDronID (RoutingContext context) {
+	private void getDroneByDroneID (RoutingContext context) {
 		
 		dataBase.query("SELECT * FROM proyecto_ploc.drones WHERE id_dron = " + context.request().getParam("idDron"), res -> {
 			if(res.succeeded()) {
@@ -166,7 +166,7 @@ public class DataBaseVerticle extends AbstractVerticle{
 		
 	}
 	
-	private void deleteDronByDronID(RoutingContext context) {
+	private void deleteDroneByDroneID(RoutingContext context) {
 		
 		dataBase.query("DELETE FROM proyecto_ploc.drones WHERE id_dron = " + context.request().getParam("idDron"), res -> {
 			if(res.succeeded()) {
