@@ -25,7 +25,7 @@ public class DataBaseVerticle extends AbstractVerticle{
 	public void start(Promise<Void> startPromise) {
 		
 		MySQLConnectOptions connectOption = new MySQLConnectOptions().setPort(3306).setHost("localhost")
-				.setDatabase("proyecto_ploc").setUser("root").setPassword("Universo55!");
+				.setDatabase("proyecto_ploc").setUser("root").setPassword("contraseña");
 		PoolOptions poolOption = new PoolOptions().setMaxSize(5);
 		
 		dataBase = MySQLPool.pool(vertx, connectOption, poolOption); 
