@@ -6,6 +6,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.mysqlclient.MySQLConnectOptions;
 import io.vertx.mysqlclient.MySQLPool;
 import io.vertx.sqlclient.PoolOptions;
@@ -40,6 +41,8 @@ public class DataBaseVerticle extends AbstractVerticle{
 		
 		//-----------------------------------------------------------------TABLA DRONES------------------------------------------------------------
 		
+		router.route("/api/drones").handler(BodyHandler.create());
+		
 		router.get("/api/drones").handler(this::getAllDrones);
 		router.get("/api/drones/:idDron").handler(this::getDonByDronID);
 		router.post("/api/drones").handler(this::postDrone);
@@ -47,21 +50,30 @@ public class DataBaseVerticle extends AbstractVerticle{
 		
 		//-----------------------------------------------------------------TABLA SENSORES------------------------------------------------------------
 		
+		router.route("/api/sensores").handler(BodyHandler.create());
+		
 		router.get("/api/sensores").handler(this::getAllSensors);
 		router.get("/api/sensores/:idSensor").handler(this::getSensorBySensorID);
+		router.post("/api/sensores").handler(this::postSensor);
 		router.delete("/api/sensores/:idSensor").handler(this::deleteSensorBySensorID);
 		
 		//-----------------------------------------------------------------TABLA VALORES------------------------------------------------------------
 		
+		router.route("/api/valores").handler(BodyHandler.create());
+		
 		router.get("/api/valores").handler(this::getAllValues);
 		router.get("/api/valores/:idSensor").handler(this::getValuesBySensorID);
+		router.post("/api/valores").handler(this::postValue);
 		router.delete("/api/valores/:idSensor").handler(this::deleteValuesBySensorID);
 		
 		//-----------------------------------------------------------------TABLA RUTAS------------------------------------------------------------
 				
-		router.get("/api/ruta").handler(this::getAllPaths);
-		router.get("/api/ruta/:idRuta").handler(this::getPathByPathID);
-		router.delete("/api/ruta/:idRuta").handler(this::deletePathByPathID);
+		router.route("/api/rutas").handler(BodyHandler.create());
+		
+		router.get("/api/rutas").handler(this::getAllPaths);
+		router.get("/api/rutas/:idRuta").handler(this::getPathByPathID);
+		router.post("/api/rutas").handler(this::postPath);
+		router.delete("/api/rutas/:idRuta").handler(this::deletePathByPathID);
 	}
 	
 	//-----------------------------------------------------------------TABLA DRONES------------------------------------------------------------
@@ -121,11 +133,12 @@ public class DataBaseVerticle extends AbstractVerticle{
 		});
 	}
 	
-	private void postDrone(RoutingContext context) {
-		
+	private void postDrone(RoutingContext context) {		
 		JsonObject body = context.getBodyAsJson();
-		dataBase.query("INSERT INTO proyecto_ploc.drones values " + body.getInteger("idDron") + "," + body.getInteger("pesoSoportado") + ",null," + "GARAJE," 
-		+ body.getString("parkingPath") + "," + body.getInteger("idSensor") + "," + body.getInteger("idRuta"), res -> {
+		
+		dataBase.query("INSERT INTO proyecto_ploc.drones (ID_DRON,PESO_SOPORTADO,ESTADO,PARKING_PATH,ID_SENSOR,ID_RUTA) values "
+				+ "(" + body.getInteger("idDron") + "," + body.getInteger("pesoSoportado") + ",'" + body.getString("estado") + "','" 
+		+ body.getString("parkingPath") + "'," + body.getInteger("idSensor") + "," + body.getInteger("idRuta") + ")", res -> {
 			
 			if(res.succeeded()) {
 				System.out.println("Se ha añadido la línea con éxito :D");
@@ -182,6 +195,7 @@ public class DataBaseVerticle extends AbstractVerticle{
 	}
 	
 	private void deleteSensorBySensorID(RoutingContext context) {
+
 		
 		dataBase.query("DELETE FROM proyecto_ploc.sensores WHERE id_sensor = " + context.request().getParam("idSensor"), res -> {
 			if(res.succeeded()) {
@@ -192,6 +206,24 @@ public class DataBaseVerticle extends AbstractVerticle{
 				context.response().setStatusCode(401).putHeader("content-type", "application/json").end(JsonObject.mapFrom(res.cause()).encodePrettily());
 			}
 		});
+	}
+	
+	private void postSensor(RoutingContext context) {		
+		JsonObject body = context.getBodyAsJson();
+		
+		dataBase.query("INSERT INTO proyecto_ploc.sensores (ID_SENSOR,TIPO,TIEMPO_ACT) values "
+				+ "(" + body.getInteger("idSensor") + ",'" + body.getString("tipo") + "'," + body.getInteger("tiempoAct") + ")", res -> {
+			
+			if(res.succeeded()) {
+				System.out.println("Se ha añadido la línea con éxito :D");
+				context.response().setStatusCode(201).putHeader("content-type", "application/json").end(body.encodePrettily());
+			}else {
+				System.out.println("Algo ha salido mal :(");
+				context.response().setStatusCode(401).putHeader("content-type", "application/json").end(JsonObject.mapFrom(res.cause()).encodePrettily());
+			}
+			
+		});
+		
 	}
 	
 	//-----------------------------------------------------------------TABLA VALORES------------------------------------------------------------
@@ -232,6 +264,24 @@ public class DataBaseVerticle extends AbstractVerticle{
 				System.out.println("Algo salio mal :(\n");
 				context.response().setStatusCode(401).putHeader("content-type", "application/json").end(JsonObject.mapFrom(res.cause()).encodePrettily());
 			}
+		});
+		
+	}
+	
+	private void postValue(RoutingContext context) {		
+		JsonObject body = context.getBodyAsJson();
+		
+		dataBase.query("INSERT INTO proyecto_ploc.valores (ID_VALOR,TIMESTAMP,OBS,ID_SENSOR) values "
+				+ "(" + body.getInteger("idValor") + "," + body.getLong("timestamp") + "," + body.getBoolean("obs") + "," + body.getInteger("idSensor") + ")", res -> {
+			
+			if(res.succeeded()) {
+				System.out.println("Se ha añadido la línea con éxito :D");
+				context.response().setStatusCode(201).putHeader("content-type", "application/json").end(body.encodePrettily());
+			}else {
+				System.out.println("Algo ha salido mal :(");
+				context.response().setStatusCode(401).putHeader("content-type", "application/json").end(JsonObject.mapFrom(res.cause()).encodePrettily());
+			}
+			
 		});
 		
 	}
@@ -287,6 +337,24 @@ public class DataBaseVerticle extends AbstractVerticle{
 				System.out.println("Algo salio mal :(\n");
 				context.response().setStatusCode(401).putHeader("content-type", "application/json").end(JsonObject.mapFrom(res.cause()).encodePrettily());
 			}
+		});
+		
+	}
+	
+	private void postPath(RoutingContext context) {		
+		JsonObject body = context.getBodyAsJson();
+		
+		dataBase.query("INSERT INTO proyecto_ploc.rutas (ID_RUTA,PATH,TIEMPO_RUTA) values "
+				+ "(" + body.getInteger("idRuta") + ",'" + body.getString("path") + "'," + body.getInteger("tiempoRuta") + ")", res -> {
+			
+			if(res.succeeded()) {
+				System.out.println("Se ha añadido la línea con éxito :D");
+				context.response().setStatusCode(201).putHeader("content-type", "application/json").end(body.encodePrettily());
+			}else {
+				System.out.println("Algo ha salido mal :(");
+				context.response().setStatusCode(401).putHeader("content-type", "application/json").end(JsonObject.mapFrom(res.cause()).encodePrettily());
+			}
+			
 		});
 		
 	}
