@@ -430,7 +430,7 @@ public class DataBaseVerticle extends AbstractVerticle{
 	
 	private void deletePathByPathID(RoutingContext context) {
 		
-		dataBase.query("DELETE FROM proyecto_ploc.valores WHERE id_ruta = " + context.request().getParam("idRuta"), res -> {
+		dataBase.query("DELETE FROM proyecto_ploc.rutas WHERE id_ruta = " + context.request().getParam("idRuta"), res -> {
 			if(res.succeeded()) {
 				System.out.println("Entrada borrada con éxito :D");
 				context.response().setStatusCode(201).putHeader("content-type", "application/json").end();

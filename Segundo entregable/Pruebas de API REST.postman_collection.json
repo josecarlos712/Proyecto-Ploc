@@ -1,0 +1,495 @@
+{
+	"info": {
+		"_postman_id": "d7f7b7cd-482d-4b3d-a1df-145e0e5516a6",
+		"name": "Pruebas de API REST",
+		"description": "Esta colección contendrá todas las pruebas que se realizarán a la API REST, así como su resultado.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "getAllDrones",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8085/api/drones",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"drones"
+					]
+				},
+				"description": "Devuelve el contenido de la tabla drones"
+			},
+			"response": []
+		},
+		{
+			"name": "getDroneByDroneID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8085/api/drones/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"drones",
+						"1"
+					]
+				},
+				"description": "Devuelve la información del dron con ID 1"
+			},
+			"response": []
+		},
+		{
+			"name": "postDrone",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"idDron\" : 3,\n\t\"pesoSoportado\" : 6,\n\t\"bateria\" : 95,\n\t\"parkingPath\" : \"4F-R-2F\",\n\t\"estado\" : \"GARAJE\",\n\t\"idSensor\" : 2,\n\t\"idRuta\" : 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8085/api/drones",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"drones"
+					]
+				},
+				"description": "Adición de un dron a la base de datos"
+			},
+			"response": []
+		},
+		{
+			"name": "putDrone",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"idDron\" : 3,\n\t\"pesoSoportado\" : 6,\n\t\"bateria\" : 100,\n\t\"parkingPath\" : \"4F-R-2F\",\n\t\"estado\" : \"GARAJE\",\n\t\"idSensor\" : 2,\n\t\"idRuta\" : 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8085/api/drones/3",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"drones",
+						"3"
+					]
+				},
+				"description": "Update de un dron en la base de datos"
+			},
+			"response": []
+		},
+		{
+			"name": "deleteDroneByDroneID",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8085/api/drones/3",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"drones",
+						"3"
+					]
+				},
+				"description": "Eliminación de un dron por su ID"
+			},
+			"response": []
+		},
+		{
+			"name": "getAllSensors",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8085/api/sensores",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"sensores"
+					]
+				},
+				"description": "Obtenemos la información de todos los sensores de la base de datos"
+			},
+			"response": []
+		},
+		{
+			"name": "getSensorBySensorID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8085/api/sensores/5",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"sensores",
+						"5"
+					]
+				},
+				"description": "Obtenemos un sensor por su ID"
+			},
+			"response": []
+		},
+		{
+			"name": "postSensor",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"idSensor\" : 6,\n\t\"tipo\" : \"Prox\",\n\t\"tiempoAct\" : 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8085/api/sensores",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"sensores"
+					]
+				},
+				"description": "Adición de un sensor a la base de datos"
+			},
+			"response": []
+		},
+		{
+			"name": "putSensor",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"idSensor\" : 6,\n\t\"tipo\" : \"Prox\",\n\t\"tiempoAct\" : 50\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8085/api/sensores/6",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"sensores",
+						"6"
+					]
+				},
+				"description": "Modificación de un sensor en la base de datos"
+			},
+			"response": []
+		},
+		{
+			"name": "deleteSensorBySensorID",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"idSensor\" : 6,\n\t\"tipo\" : \"Prox\",\n\t\"tiempoAct\" : 50\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8085/api/sensores/6",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"sensores",
+						"6"
+					]
+				},
+				"description": "Eliminación de un sensor por su ID"
+			},
+			"response": []
+		},
+		{
+			"name": "getAllValues",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8085/api/valores",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"valores"
+					]
+				},
+				"description": "Obtención de todos las entradas de la tabla valores de la base de datos"
+			},
+			"response": []
+		},
+		{
+			"name": "getValueBySensorID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8085/api/valores/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"valores",
+						"1"
+					]
+				},
+				"description": "Obtención de la información de valores para un sensor"
+			},
+			"response": []
+		},
+		{
+			"name": "postValue",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"idValor\" : 0,\n\t\"timestamp\" : 3,\n\t\"obs\" : false,\n\t\"idSensor\" : 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8085/api/valores",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"valores"
+					]
+				},
+				"description": "Adición de un valor a la base de datos"
+			},
+			"response": []
+		},
+		{
+			"name": "deleteValueBySensorID",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"idValor\" : 0,\n\t\"timestamp\" : 3,\n\t\"obs\" : false,\n\t\"idSensor\" : 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8085/api/valores/2",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"valores",
+						"2"
+					]
+				},
+				"description": "Eliminación de todos los valores ligados a un sensor"
+			},
+			"response": []
+		},
+		{
+			"name": "getAllPaths",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"idValor\" : 0,\n\t\"timestamp\" : 3,\n\t\"obs\" : false,\n\t\"idSensor\" : 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8085/api/rutas",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"rutas"
+					]
+				},
+				"description": "Obtención de todas las rutas de la base de datos"
+			},
+			"response": []
+		},
+		{
+			"name": "getPathByPathID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8085/api/rutas/2",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"rutas",
+						"2"
+					]
+				},
+				"description": "Obtención de la información de una ruta por su ID"
+			},
+			"response": []
+		},
+		{
+			"name": "postPath",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"idRuta\" : 3,\n\t\"tiempoRuta\" : 20,\n\t\"path\" : \"2F-R-F\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8085/api/rutas",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"rutas"
+					]
+				},
+				"description": "Adición de una nueva ruta a la base de datos"
+			},
+			"response": []
+		},
+		{
+			"name": "putPath",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"idRuta\" : 3,\n\t\"tiempoRuta\" : 60,\n\t\"path\" : \"2F-R-3F-L-2F\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8085/api/rutas/3",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"rutas",
+						"3"
+					]
+				},
+				"description": "Modificación de una ruta"
+			},
+			"response": []
+		},
+		{
+			"name": "deletePathByPathID",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8085/api/rutas/3",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"rutas",
+						"3"
+					]
+				},
+				"description": "Eliminación de una ruta por su ID"
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
