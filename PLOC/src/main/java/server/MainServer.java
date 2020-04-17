@@ -23,6 +23,7 @@ public class MainServer extends AbstractVerticle{
 //		});
 		
 		vertx.deployVerticle(DataBaseVerticle.class.getName());
+		vertx.deployVerticle(TelegramVerticle.class.getName());
 		
 	}
 
