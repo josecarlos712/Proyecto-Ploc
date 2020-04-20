@@ -21,7 +21,7 @@ public class TelegramVerticle extends AbstractVerticle {
 	
 	@Override
 	public void start(Promise<Void> future) {
-		TelegramOptions options = new TelegramOptions().setBotName("PlocBot").setBotToken("Token");
+		TelegramOptions options = new TelegramOptions().setBotName("PlocBot").setBotToken("token");
 		
 		bot = TelegramBot.create(vertx, options).receiver(new LongPollingReceiver().onUpdate(handler -> {
 			
