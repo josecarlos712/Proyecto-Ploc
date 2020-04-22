@@ -16,8 +16,7 @@ import io.vertx.ext.web.client.WebClient;
 public class TelegramVerticle extends AbstractVerticle {
 
 	private TelegramBot bot;
-	private boolean resolvingWeather = false;
-	private boolean resolvingFilm = false;
+	private boolean resolvingRequest = false;
 	
 	@Override
 	public void start(Promise<Void> future) {
@@ -29,97 +28,163 @@ public class TelegramVerticle extends AbstractVerticle {
 			if(handler.getMessage().getText().toLowerCase().contains("hola")) {
 				System.out.println("Mensaje recibido con exito :D");
 				bot.sendMessage(new SendMessage().setText("Hola " + handler.getMessage().getFrom().getFirstName() + " bienvenido, soy el bot que ha creado Placix5 :D\n\n"
-						+ "Mi creador ha querido que me parezca a él, así que tengo que deciros: OSTIA LOCO QUE GUAAAAAPO\n\n" 
-						+ "Acto seguido, me gustaría enunciar las funciones que tengo disponibles para que las probéis y recordad que no soy Placi, si queréis hablar "
-						+ "con el tendréis que escribirle a él directamente.\nLas funciones son:\n\n- Tiempo\n- Pelis de Studio Ghibli\n\n :D").setChatId(handler.getMessage().getChatId()));
+						+ "Se me ha encomendado la tarea de informar sobre el estado del proyecto PLOC hasta que se encuentre funcional, "
+						+ "cuando eso ocurra podré ofrecer información sobre los drones, las rutas y los sensores :D\n\n"
+						+ "De momento, puedes preguntar sobre el estado de las siguientes cosas:\n\n"
+						+ " - GitHub del proyecto\n"
+						+ " - Prototipo hardware\n"
+						+ " - Base de datos\n"
+						+ " - API REST\n"
+						+ " - MQTT").setChatId(handler.getMessage().getChatId()));
 			}else 
 			
 				//-------------------------------------------------COMANDO TIEMPO----------------------------------------------------	
 				
-			if (handler.getMessage().getText().toLowerCase().contains("tiempo") || resolvingWeather){			
+			if (handler.getMessage().getText().toLowerCase().contains("github")){			
 				
-				if(resolvingWeather) {
-					String city = handler.getMessage().getText();
-					
-					WebClient client = WebClient.create(vertx);
-					client.get("api.openweathermap.org", "/data/2.5/weather?q="+city+"&APPID=77831608c4509c8256a22e8d43e0b54b&units=metric").send(ar ->{
-					//	PROCESAMIENTO DE LA RESPUESTA
-						if(ar.succeeded()) {
-							HttpResponse<Buffer> response = ar.result();
-							JsonObject body = response.bodyAsJsonObject();
-						
-							Float temp = body.getJsonObject("main").getFloat("temp");
-							Float press = body.getJsonObject("main").getFloat("pressure");
-							Float hum = body.getJsonObject("main").getFloat("humidity");
-							
-							String princ = body.getJsonArray("weather").getJsonObject(0).getString("main");
-						
-							bot.sendMessage(new SendMessage().setText("El tiempo en " + city + " esta principalmente " + princ +", aquí puedes ver otra información relevante:"
-									+ "\n\n"
-									+ "- Temperatura: " + temp + " ºC\n- Presión: " + press + " mmHg\n- Humedad: " + hum + " %")
-									.setChatId(handler.getMessage().getChatId()));
-						}else {
-							bot.sendMessage(new SendMessage().setText("Vaya, algo ha salido mal :(").setChatId(handler.getMessage().getChatId()));
-						}
-					});
-					
-					resolvingWeather = false;
-				}else {
-					bot.sendMessage(new SendMessage().setText("Estupendo :D\nIntroduce el nombre de la ciudad en la que quieres conocer el tiempo")
-							.setChatId(handler.getMessage().getChatId()));
-					resolvingWeather = true;
-				}
+				bot.sendMessage(new SendMessage().setText("El enlace a GitHub de nuestro proyecto es el siguiente: \n\n"
+						+ "https://github.com/josecarlos712/Proyecto-Ploc\n\n"
+						+ "Esperamos que disfrutes viendo el código :D").setChatId(handler.getMessage().getChatId()));
 				
 			}
 			
-			if(handler.getMessage().getText().toLowerCase().contains("peli") || resolvingFilm) {
+			if (handler.getMessage().getText().toLowerCase().contains("prototipo")){			
 				
-				if(resolvingFilm) {
-					String film = handler.getMessage().getText().toLowerCase();
-					
-					WebClient client = WebClient.create(vertx);
-					client.get("ghibliapi.herokuapp.com", "/films").send(ar -> {
+				bot.sendMessage(new SendMessage().setText("Nuestro prototipo hardware aún está en desarrollo, aunque ahora mismo el "
+						+ "desarrollo se encuentra paralizado porque no disponemos de los materiales necesarios :(\n\n"
+						+ "Pero pronto retomaremos el desarrollo :D").setChatId(handler.getMessage().getChatId()));
+				
+			}
+			
+			if (handler.getMessage().getText().toLowerCase().contains("base")){			
+				
+				bot.sendMessage(new SendMessage().setText("Nuestra base de datos está finalizada y es funcional, aunque estamos abiertos"
+						+ " a cualquier posible ampliación que sea necesaria puesto que según vayamos avanzando en el proyecto puede que "
+						+ "surjan imprevistos que no hayamos contemplado antes y haya que buscarles una solución :D\n\n"
+						+ "En el estado actual, la base de datos cuenta con las siguientes tablas:\n"
+						+ " - Drones --> En esta tabla se introduce la información correspondiente con cada uno de los drones :D\n"
+						+ " - Rutas --> En esta tabla podemos encontrar las diferentes rutas que tenemos disponibles para que sigan los drones :D\n"
+						+ " - Sensores --> En esta tabla encontramos los diferentes sensores registrados en el sistema :D\n"
+						+ " - Valores --> En esta tabla podemos encontrar los valores que van recogiendo cada uno de los diferentes sensores que hay en la tabla sensores :D\n")
+						.setChatId(handler.getMessage().getChatId()));
+				
+			}
+			
+			if (handler.getMessage().getText().toLowerCase().contains("api")){			
+				
+				bot.sendMessage(new SendMessage().setText("Nuestra API Rest es completamente funcional, si quieres probarla no tienes más "
+						+ "que escribir el comando /request seguido de la tabla de la que quieres conocer la información, por ejemplo: "
+						+ "/request sensores\n\n"
+						+ "Esta petición será una petición de tipo GET ya que no podemos dejar que nos borres o nos cambies cosas de "
+						+ "nuestra querida base de datos :D\n\n"
+						+ "Te recordamos las diferentes tablas de las que puedes tener información:\n"
+						+ " - Drones --> En esta tabla se introduce la información correspondiente con cada uno de los drones :D\n"
+						+ " - Rutas --> En esta tabla podemos encontrar las diferentes rutas que tenemos disponibles para que sigan los drones :D\n"
+						+ " - Sensores --> En esta tabla encontramos los diferentes sensores registrados en el sistema :D\n"
+						+ " - Valores --> En esta tabla podemos encontrar los valores que van recogiendo cada uno de los diferentes sensores que hay en la tabla sensores :D\n")
+						.setChatId(handler.getMessage().getChatId()));
+				
+			}
+			
+			if(handler.getMessage().getText().toLowerCase().contains("/request") || resolvingRequest) {
+				
+				String req = handler.getMessage().getText().toLowerCase();
+				String s[] = req.split(" ");
+				
+				WebClient client = WebClient.create(vertx);
+				client.get("192.168.56.1:8085", "/api/" + s[1].toLowerCase()).send(ar -> {
 						
-						if(ar.succeeded()) {							
-							HttpResponse<Buffer> response = ar.result();
-							JsonArray filmLs = response.bodyAsJsonArray();
+					if(ar.succeeded()) {							
+						HttpResponse<Buffer> response = ar.result();
+						JsonArray body = response.bodyAsJsonArray();
 						
-							int pos = 0;
-							for(int i = 0; i < filmLs.size(); i++) {
+						switch(s[1]) {
+						case "sensores":
+							
+							bot.sendMessage(new SendMessage().setText("La información con respecto a los sensores que tenemos es: \n\n").setChatId(handler.getMessage().getChatId()));
+							
+							for(int i = 0; i<body.size(); i++) {
+								JsonObject s1 = body.getJsonObject(i);
+								bot.sendMessage(new SendMessage().setText("------------------------Sensor " + (i+1) + "------------------------\n"
+										+ " - IDSensor: " + s1.getInteger("idSensor") + "\n"
+										+ " - Tipo: " + s1.getString("tipo") + "\n"
+										+ " - TiempoAct: " + s1.getInteger("tiempoAct") + "\n"
+										+ "--------------------------------------------------------\n\n").setChatId(handler.getMessage().getChatId()));
 								
-								JsonObject f = filmLs.getJsonObject(i);
-								if(f.getString("title").toLowerCase().equals(film)) {
-									pos = i;
-									break;
-								}
+							}							
+							
+							break;
+						case "drones":
+							
+							bot.sendMessage(new SendMessage().setText("La información con respecto a los drones que tenemos es: \n\n").setChatId(handler.getMessage().getChatId()));
+							
+							for(int i = 0; i<body.size(); i++) {
+								JsonObject s1 = body.getJsonObject(i);
+								bot.sendMessage(new SendMessage().setText("------------------------Dron " + (i+1) + "------------------------\n"
+										+ " - IDDron: " + s1.getInteger("idDron") + "\n"
+										+ " - Estado: " + s1.getString("estado") + "\n"
+										+ " - Peso soportado: " + s1.getInteger("pesoSoportado") + "\n"
+										+ " - Bateria: " + s1.getInteger("bateria") + "\n"
+										+ " - Parking Path: " + s1.getString("parkingPath") + "\n"
+										+ " - IDSensor: " + s1.getInteger("idSensor") + "\n"
+										+ " - IDRuta" + s1.getInteger("idRuta") + "\n"
+										+ "------------------------------------------------------\n\n").setChatId(handler.getMessage().getChatId()));
 								
-							}
+							}	
 							
-							JsonObject finalFilm = filmLs.getJsonObject(pos);
-							String title = finalFilm.getString("title");
-							String description = finalFilm.getString("description");
-							String director = finalFilm.getString("director");
-							String producer = finalFilm.getString("producer");
-							String releaseDate = finalFilm.getString("release_date");
+							break;
+						case "valores":
 							
-							bot.sendMessage(new SendMessage().setText("Título: " + title + "\n"
-									+ "Director: " + director + "\n"
-									+ "Productor: " + producer + "\n"
-									+ "Año de lanzamiento: " + releaseDate + "\n\n"
-									+ "Descripción: " + description ).setChatId(handler.getMessage().getChatId()));
+							bot.sendMessage(new SendMessage().setText("La información con respecto a los valores que tenemos es: \n\n").setChatId(handler.getMessage().getChatId()));
 							
+							for(int i = 0; i<body.size(); i++) {
+								JsonObject s1 = body.getJsonObject(i);
+								bot.sendMessage(new SendMessage().setText("------------------------Valor " + (i+1) + "------------------------\n"
+										+ " - IDValor: " + s1.getInteger("idValor") + "\n"
+										+ " - TimeStamp: " + s1.getLong("timestamp") + "\n"
+										+ " - Obstaculo: " + s1.getBoolean("obs") + "\n"
+										+ " - IDSensor: " + s1.getInteger("idSensor") + "\n"
+										+ "-------------------------------------------------------\n\n").setChatId(handler.getMessage().getChatId()));
+								
+							}	
 							
-						}else {
-							bot.sendMessage(new SendMessage().setText("Vaya, algo ha salido mal :(").setChatId(handler.getMessage().getChatId()));
+							break;
+						case "rutas":
+							
+							bot.sendMessage(new SendMessage().setText("La información con respecto a las rutas que tenemos es: \n\n").setChatId(handler.getMessage().getChatId()));
+							
+							for(int i = 0; i<body.size(); i++) {
+								JsonObject s1 = body.getJsonObject(i);
+								bot.sendMessage(new SendMessage().setText("------------------------Rutas " + (i+1) + "------------------------\n"
+										+ " - IDRuta: " + s1.getInteger("idRuta") + "\n"
+										+ " - Tiempo Ruta: " + s1.getInteger("tiempoRuta") + "\n"
+										+ " - Path: " + s1.getString("path") + "\n"
+										+ "-------------------------------------------------------\n\n").setChatId(handler.getMessage().getChatId()));
+								
+							}	
+							
+							break;
+						default:
+							bot.sendMessage(new SendMessage().setText("No has introducido un valor valido :(").setChatId(handler.getMessage().getChatId()));
+							
 						}
+							
+					}else {
+						bot.sendMessage(new SendMessage().setText("Vaya, algo ha salido mal :(").setChatId(handler.getMessage().getChatId()));
+						System.out.println("***********************************************************************************************************");
+						System.out.println(ar.cause());
+						System.out.println("***********************************************************************************************************");
+					}
+				
+				});
 					
-					});
-					resolvingFilm = false;
-				}else {
-					bot.sendMessage(new SendMessage().setText("Estupendo :D\nIntroduce el nombre de la pelicula en ingles de la cual quieres obtener información")
-							.setChatId(handler.getMessage().getChatId()));
-					resolvingFilm = true;
-				}
+			}
+			
+			if (handler.getMessage().getText().toLowerCase().contains("mqtt")){			
+				
+				bot.sendMessage(new SendMessage().setText("Nuestro servidor mqtt está aún en desarrollo, en cuanto esté listo "
+						+ "informaremos de los diferentes canales que tenemos disponibles y podrás subscribirte a ellos si "
+						+ "así lo deseas :D").setChatId(handler.getMessage().getChatId()));
 				
 			}
 		}));
