@@ -211,3 +211,30 @@ URL: /api/valores/:idSensor
 **deleteDroneByDroneID** → Esta función devuelve la información de una ruta con una ID que se especifica como parámetro.
 
 URL: /api/drones/:idDron
+
+# MQTT
+
+Hemos implementado un servidor MQTT que posee dos canales característicos, de los cuales hablaremos un poco más adelante. Antes de nada queremos resaltar que todo esto es muy provisional, porque hasta que no nos enfrentemos al problema a la hora de implementarlo completamente no podremos conocer por completo los diferentes canales que vamos a necesitar implementar. Los canales que actualmente se encuentran implementados son:
+
+## SENSORS
+
+Este canal se usa para que los drones que poseen un sensor asociado y hayan encontrado un obstáculo, puedan anunciar en el canal el punto exacto en el que lo han encontrado siguiendo la ruta que se les asignó.
+Los mensajes siempre los envían los drones, por lo que el servidor simplemente deberá escuchar.
+El contenido del Json que se envía en el mensaje es el siguiente:
+
+~~~json
+{"idDron": Dron que informa del obtáculo, "idSensor": Sensor que ha usado para detectar el obstáculo,"Path": Pasos que ha seguido hasta encontrar el obstáculo}
+~~~
+
+## PATHS
+
+Este canal se usa para asignar a los drones una ruta a seguir, de forma que se les enviará un Json dirigido a un dron en específico con el siguiente contenido:
+
+~~~json
+{"idDron": Dron al que se le asigna la ruta, "idRuta": Identificador de la ruta que se encuentra en la base de datos y la cual se asignará al dron, "Path": Ruta asignada al robot}
+~~~
+
+
+
+
+
