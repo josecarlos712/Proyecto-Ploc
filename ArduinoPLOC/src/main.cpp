@@ -5,12 +5,18 @@
 #include <SoftwareSerial.h>
 #include <stdlib.h>
 
-int RL = 4;
-int FL = 5;
-int RR = 6;
-int FR = 7;
+const int RL = D0;
+const int FL = D1;
+const int RR = D2;
+const int FR = D3;
 
-int idDron = 1; //Asignamos la ID del propio dron
+const int pinecho = D7;
+const int pintrigger = D8;
+
+int tiempo = 0;
+int distancia = 0;
+
+int idDron = 2; //Asignamos la ID del propio dron
 int idRuta = -1;//Como no sabe la ruta que tiene asignada, debe pedirla
 String ruta = "";//Ruta que seguirá nuestro pequeño
 
@@ -22,6 +28,8 @@ String PASS = "A523869A";
 
 String SERVER_IP = "192.168.100.115";
 int SERVER_PORT = 80;
+
+int calculaDistancia();
 
 void obtenerInfo(); //Obtiene información relacionada con el propio dron
 void obtenerRuta(); //Obtiene toda la información relacionada con la ruta
@@ -36,10 +44,13 @@ void trazaRuta();
 
 void setup() {
 
-  //pinMode(RL,OUTPUT);
-  //pinMode(FL,OUTPUT);
-  //pinMode(RR,OUTPUT);
-  //pinMode(FR,OUTPUT);
+  pinMode(RL,OUTPUT);
+  pinMode(FL,OUTPUT);
+  pinMode(RR,OUTPUT);
+  pinMode(FR,OUTPUT);
+
+  pinMode(pinecho, INPUT);
+  pinMode(pintrigger, OUTPUT);
 
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -67,7 +78,7 @@ void loop() {
     trazaRuta();
   }
 
-  delay(10000);
+  delay(100000);
 }
 
 void obtenerInfo(){
@@ -199,8 +210,16 @@ void obtenerRuta(){
         pausa();
         break;
     }
+    if(calculaDistancia() < 20){
+
+      rutaProcesada = "";
+      ruta = "P";
+
+    }
     //delay(1500);  
   }
+
+  pausa();
   
   }
 
@@ -249,4 +268,28 @@ void pausa (){
   delay(1000);
 }
 
+int calculaDistancia(){
 
+  // ENVIAR PULSO DE DISPARO EN EL PIN "TRIGGER"
+  digitalWrite(pintrigger, LOW);
+  delayMicroseconds(2);
+  digitalWrite(pintrigger, HIGH);
+  // EL PULSO DURA AL MENOS 10 uS EN ESTADO ALTO
+  delayMicroseconds(10);
+  digitalWrite(pintrigger, LOW);
+
+  // MEDIR EL TIEMPO EN ESTADO ALTO DEL PIN "ECHO" EL PULSO ES PROPORCIONAL A LA DISTANCIA MEDIDA
+  tiempo = pulseIn(pinecho, HIGH);
+
+  // LA VELOCIDAD DEL SONIDO ES DE 340 M/S O 29 MICROSEGUNDOS POR CENTIMETRO
+  // DIVIDIMOS EL TIEMPO DEL PULSO ENTRE 58, TIEMPO QUE TARDA RECORRER IDA Y VUELTA UN CENTIMETRO LA ONDA SONORA
+  distancia = tiempo / 58;
+
+  // ENVIAR EL RESULTADO AL MONITOR SERIAL
+  Serial.print(distancia);
+  Serial.println(" cm");
+  delay(100);
+
+  return distancia;
+
+}
