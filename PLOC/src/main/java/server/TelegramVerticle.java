@@ -92,11 +92,15 @@ public class TelegramVerticle extends AbstractVerticle {
 				String s[] = req.split(" ");
 				
 				WebClient client = WebClient.create(vertx);
-				client.get("192.168.56.1:8085", "/api/" + s[1].toLowerCase()).send(ar -> {
+				client.get("10.202.89.250", "/api/" + s[1].toLowerCase()).send(ar -> {
 						
 					if(ar.succeeded()) {							
 						HttpResponse<Buffer> response = ar.result();
 						JsonArray body = response.bodyAsJsonArray();
+						
+						System.out.println("***************************************************************************");
+						System.out.println(body);
+						System.out.println("***************************************************************************");
 						
 						switch(s[1]) {
 						case "sensores":

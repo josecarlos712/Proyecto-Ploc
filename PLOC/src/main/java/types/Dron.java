@@ -14,13 +14,13 @@ public class Dron {
 		super();
 	}
 
-	public Dron(int idDron, int pesoSoportado, int bateria, String estao, String parkingPath, int idSensor,
+	public Dron(int idDron, int pesoSoportado, int bateria, String estado, String parkingPath, int idSensor,
 			int idRuta) {
 		super();
 		this.idDron = idDron;
 		this.pesoSoportado = pesoSoportado;
 		this.bateria = bateria;
-		this.estado = estao;
+		this.estado = estado;
 		this.parkingPath = parkingPath;
 		this.idSensor = idSensor;
 		this.idRuta = idRuta;
@@ -50,12 +50,12 @@ public class Dron {
 		this.bateria = bateria;
 	}
 
-	public String getEstao() {
+	public String getestado() {
 		return estado;
 	}
 
-	public void setEstao(String estao) {
-		this.estado = estao;
+	public void setestado(String estado) {
+		this.estado = estado;
 	}
 
 	public String getParkingPath() {
@@ -130,7 +130,7 @@ public class Dron {
 
 	@Override
 	public String toString() {
-		return "Drones [idDron=" + idDron + ", pesoSoportado=" + pesoSoportado + ", bateria=" + bateria + ", estao="
+		return "Drones [idDron=" + idDron + ", pesoSoportado=" + pesoSoportado + ", bateria=" + bateria + ", estado="
 				+ estado + ", parkingPath=" + parkingPath + ", idSensor=" + idSensor + ", idRuta=" + idRuta + "]";
 	}
 	

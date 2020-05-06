@@ -234,7 +234,9 @@ Este canal se usa para asignar a los drones una ruta a seguir, de forma que se l
 {"idDron": Dron al que se le asigna la ruta, "idRuta": Identificador de la ruta que se encuentra en la base de datos y la cual se asignará al dron, "Path": Ruta asignada al robot}
 ~~~
 
+# TELEGRAM
 
+Hemos creado un bot de Telegram, el cual informa del estado actual del proyecto y de cómo se encuentra el desarrollo del mismo. El bot se llama: @PlocBot
 
-
+El código del bot se encuentra dentro del proyecto ya que hemos usado vertx para crearlo.
 
