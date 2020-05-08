@@ -1,9 +1,12 @@
+#define BLYNK_PRINT Serial
+
 #include <Arduino.h>
 #include "ArduinoJson.h"
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <SoftwareSerial.h>
 #include <stdlib.h>
+#include <BlynkSimpleEsp8266.h>
 
 const int RL = D0;
 const int FL = D1;
@@ -23,11 +26,17 @@ String ruta = "";//Ruta que seguirá nuestro pequeño
 char respondeBuffer[300];
 WiFiClient client;
 
+char auth[] = "token";
+char ssid[] = "PUERTOSURFIBRA869A";
+char pass[] = "contraseña";
+
 String SSID = "PUERTOSURFIBRA869A";
-String PASS = "A523869A";
+String PASS = "contraseña";
 
 String SERVER_IP = "192.168.100.115";
 int SERVER_PORT = 80;
+
+int manual = 0;
 
 int calculaDistancia();
 
@@ -42,12 +51,22 @@ void pausa();
 
 void trazaRuta();
 
+BLYNK_WRITE(V5)
+{
+  manual = param.asInt(); // assigning incoming value from pin V1 to a variable
+  // You can also use:
+  // String i = param.asStr();
+  // double d = param.asDouble();
+}
+
 void setup() {
 
   pinMode(RL,OUTPUT);
   pinMode(FL,OUTPUT);
   pinMode(RR,OUTPUT);
   pinMode(FR,OUTPUT);
+  pinMode(D5,OUTPUT);
+  pinMode(D4,INPUT);
 
   pinMode(pinecho, INPUT);
   pinMode(pintrigger, OUTPUT);
@@ -55,6 +74,8 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   WiFi.begin(SSID,PASS);
+
+  Blynk.begin(auth,ssid,pass);
 
   Serial.println("Connecting...");
   while(WiFi.status() != WL_CONNECTED){
@@ -67,18 +88,24 @@ void setup() {
 }
 
 void loop() {
+  Blynk.run();
+
+  if(manual != 1){
+
+    pausa();
+    //Solucitud de información adicional
+    obtenerInfo();
   
-  //Solucitud de información adicional
-  obtenerInfo();
-  
-  if(idRuta != -1){
-    //Pide la ruta correspondiente
-    obtenerRuta();
-    //Tratamiento de la ruta
-    trazaRuta();
+    if(idRuta != -1){
+      //Pide la ruta correspondiente
+      obtenerRuta();
+      //Tratamiento de la ruta
+      trazaRuta();
+    }
+
   }
 
-  delay(100000);
+  delay(10000);
 }
 
 void obtenerInfo(){
