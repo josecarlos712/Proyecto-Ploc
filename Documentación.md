@@ -234,6 +234,66 @@ Este canal se usa para asignar a los drones una ruta a seguir, de forma que se l
 {"idDron": Dron al que se le asigna la ruta, "idRuta": Identificador de la ruta que se encuentra en la base de datos y la cual se asignará al dron, "Path": Ruta asignada al robot}
 ~~~
 
+# PROTOTIPO HARDWARE
+
+Hemos completado el prototipo hardware y además hemos conseguido realizar la conexión con la base de datos. Además de este sistema de conexión a la base de datos usando la API REST, hemos incluido un sistema de control usando una aplicación para móvil mediante la librería Blynk. El código del mismo puede encontrarse en esta misma carpeta, su nombre es ArduinoPloc.
+
+## VARIABLES RELEVANTES
+
+Dentro del mismo, se puede ver que contamos con varias variables globales que podemos usar durante todo el programa, como son las variables
+
+- **idDron** la cual contiene el ID del dron, que debemos especificarlo nosotros manualmente. 
+- **idRuta** la cual contiene el ID de la ruta que se le ha asignado al dron. Este ID deberá solicitarse al servidor mediante la función correspondiente, en este caso es la función **obtenerInfo()**, en la cual se obtiene la información del dron asociada a su ID mediante una petición GET a la API REST.
+- **idSensor** la cual contiene el ID del sensor que se le asocia al dron. Al igual que en el caso anterior, debe solicitarse previamente al servidor mediante la función **obtenerInfo()**.
+- **Ruta** la cual contiene el path de la ruta que se le ha asignado al dron. Para ello, una vez que disponemos del idRuta asignado a nuestro dron, se llama a la función **obtenerRuta()**, en la cual se obtiene la información del dron asociada a su idRuta mediante una petición GET a la API REST.
+
+## FUNCIONES
+
+En cuanto a las funciones, disponemos de varias funciones las cuales se encargan de realizar diferentes tareas, desde controlar el movimiento del dron mediante los pines correspondientes hasta de realizar las peticiones a la API REST. Vamos a proceder a catalogar las funciones más relevantes dentro del proyecto en varias secciones:
+
+### MOVIMIENTO
+
+En el apartado del movimiento, hay que recordar que nuestros drones deben ser capaces de realizar movimientos, pero estos movimientos se traducen en activación y desactivación de los pines asociados al controlador del motos. Para facilitar esta tarea, hemos definido una serie de funciones que realizan toda la configuración de pines para que el dron se mueva en función de lo que nosotros queremos:
+
+- **avanzar()**
+- **retroceder()**
+- **giroIzquierda()**
+- **giroDerecha()**
+- **pausa()**
+
+Cada una de estas funciones se activan durante un tiempo, en concreto durante un segundo, de forma que cuando interpretamos las rutas, el hecho de que aparezca un comando de avanzar, el dron avanzará durante un segundo.
+
+### CONEXIÓN CON LA BASE DE DATOS
+
+En el apartado de la conexión con la base de datos, ya se ha adelantado anteriormente que consiste en dos funciones principalmente, aunque luego aumentarán ya que debemos incorporar varias funcionalidades más. Estas dos funciones son las siguientes:
+
+- **obtenerInfo()**: Esta función obtiene la información del dron asociada a su ID mediante una petición GET a la API REST. Esta información es la entrada entera correspondiente de la base de datos para ese dron. En ella podemos encontrar el estado de la batería, el estado actual del dron, las IDs que necesitamos...
+- **obtenerRuta()**: Esta función obtiene la información del dron asociada a su idRuta mediante una petición GET a la API REST. Esta información, al igual que en el caso anterior, contiene todas las columnas de la entrada correspondiente de dicha ruta en la base de datos. En ella podemos encontrar el path de la ruta y el tiempo que tarda en realizarse dicha ruta
+
+En ambos casos, solamente almacenaremos la información que realmente vayamos a utilizar, aunque si tenemos la placa enchufada al PC, podemos llegar a ver toda la información que estamos obteniendo.
+
+### TRATAMIENTO DE LAS RUTAS
+
+En el apartado del tratamiento de las rutas, podemos encontrar una función que se encarga de interpretar el path que está asociado a la ruta que se le ha asignado al dron y de ejecutarlo. Primero, pasa el path por un procesado, en el que se crea la cadena completa que posteriormente se interpretará. Una vez hecho esto, la **rutaProcesada** se pasa a un bucle for, el cual va ejecutando todos los pasos hasta el final. Cada vez que realiza una acción llamando a una de las funciones correspondientes al movimiento que dijimos antes comprueba si tiene algún objeto delante, en caso de que lo tenga se detiene e informa al servidor, en caso contrario, continúa ejecutando la ruta procesada.
+
+Una vez que el dron haya realizado satisfactoriamente la ruta que se le ha asignado, se queda a la espera de que se le asigne una nueva ruta. En caso de que no cambie la ruta en la base de datos, volverá a recorrer la misma. Entre cada asignación de rutas dejamos pasar un tiempo.
+
+La función que se encarga de realizar todas estas acciones se llama: **trazaRuta()** 
+
+### COMPROBACIÓN DE OBSTÁCULOS
+
+En el apartado de la comprobación de obstáculos hemos añadido una función que se encarga de medir la distancia usando el sensor de ultrasonidos que tiene incorporado el dron. Esta función ejecuta todos los pasos necesarios para poder medir la distancia que son los siguientes:
+
+1. Enviar un pulso de disparo al pin **Trigger**
+2. Medir el tiempo en estado alto del pin **Echo**
+3. Calcular la distancia en función del tiempo de ida y vuelta de la señal sónica
+
+Esta función devuelve la distancia en cm y nosotros decidiremos en cada caso cómo usarla. La función que se encarga de realizar todas estas acciones se llama: **calculaDistancia()**
+
+### CONTROL MANUAL
+
+Hemos incluido un sistema de control manual usando la aplicación y las librerías de Blynk. Para ello, simplemente se ejecuta una instrucción llamada **Blynk.run()**, la cual se encuentra en el **loop()** y evalúa los botones que hemos establecido en el entorno virtual de Blynk, es decir, la aplicación y realiza la correspondiente acción en función del que se haya pulsado. Es decir, si se ha pulsado el botón de avanzar, se ejecutará la instrucción de avanzar.
+
 # TELEGRAM
 
 Hemos creado un bot de Telegram, el cual informa del estado actual del proyecto y de cómo se encuentra el desarrollo del mismo. El bot se llama: @PlocBot

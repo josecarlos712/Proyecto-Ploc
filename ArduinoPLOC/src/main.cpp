@@ -16,11 +16,14 @@ const int FR = D3;
 const int pinecho = D7;
 const int pintrigger = D8;
 
+long timestamp = 0;
+
 int tiempo = 0;
 int distancia = 0;
 
 int idDron = 2; //Asignamos la ID del propio dron
 int idRuta = -1;//Como no sabe la ruta que tiene asignada, debe pedirla
+int idSensor = -1;//Como no sabe el sensor que tiene asignada, debe pedirla
 String ruta = "";//Ruta que seguirá nuestro pequeño
 
 char respondeBuffer[300];
@@ -42,6 +45,8 @@ int calculaDistancia();
 
 void obtenerInfo(); //Obtiene información relacionada con el propio dron
 void obtenerRuta(); //Obtiene toda la información relacionada con la ruta
+
+void enviarValores(); //Enviamos los valores de los sensores a la base de datos
 
 void avanzar();
 void retroceder();
@@ -88,10 +93,10 @@ void setup() {
 }
 
 void loop() {
-  Blynk.run();
 
   if(manual != 1){
 
+    digitalWrite(D5,LOW);
     pausa();
     //Solucitud de información adicional
     obtenerInfo();
@@ -103,9 +108,19 @@ void loop() {
       trazaRuta();
     }
 
+      ruta = "";
+      delay(10000);
   }
 
-  delay(10000);
+  if(calculaDistancia() < 20){
+ 
+      ruta = "P";
+      pausa();
+
+  }
+
+    Blynk.run();
+
 }
 
 void obtenerInfo(){
@@ -138,7 +153,7 @@ void obtenerInfo(){
     int pesoSoportado = doc[0]["pesoSoportado"].as<int>();
     int bateria = doc[0]["bateria"].as<int>();
     String parkingPath = doc[0]["parkingPath"].as<char*>();
-    int idSensor = doc[0]["idSensor"].as<int>();
+    idSensor = doc[0]["idSensor"].as<int>();
     idRuta = doc[0]["idRuta"].as<int>();
     String estado = doc[0]["estado"].as<char*>();        
 
@@ -181,13 +196,34 @@ void obtenerRuta(){
 
     Serial.println(F("Response:"));
     ruta = doc[0]["path"].as<char*>();
-    int idSensor = doc[0]["idSensor"].as<int>();
+    //int idSensor = doc[0]["idSensor"].as<int>();
     int tiempoRuta = doc[0]["tiempoRuta"].as<int>();
 
     Serial.println(idSensor);
     Serial.println(tiempoRuta);
     Serial.println(ruta);
   }
+}
+
+void enviarValores(bool obs){
+  if(WiFi.status() == WL_CONNECTED){
+    HTTPClient http;
+    char payload[50] = "";
+
+    http.begin(client, SERVER_IP, SERVER_PORT, "/api/sensores", true);
+
+    //String payload = "{\"idValor\":0,\"timestamp\":" + timestamp + ",\"obs\":" + obs + ",\"idSensor\":" + idSensor + "}";
+    sprintf(payload, "{\"idValor\":0,\"timestamp\":%l,\"obs\":%d,\"idSensor\":%d}", timestamp, obs, idSensor);
+
+    const size_t capacity = JSON_OBJECT_SIZE(9) + JSON_ARRAY_SIZE(2) + 60;
+    DynamicJsonDocument doc(capacity);
+
+    //serializeJson(doc,payload);
+
+    http.POST(payload);
+    
+  }
+
 }
 
   void trazaRuta(){
@@ -239,10 +275,12 @@ void obtenerRuta(){
     }
     if(calculaDistancia() < 20){
 
+      enviarValores(true);
       rutaProcesada = "";
       ruta = "P";
 
     }
+    enviarValores(false);
     //delay(1500);  
   }
 

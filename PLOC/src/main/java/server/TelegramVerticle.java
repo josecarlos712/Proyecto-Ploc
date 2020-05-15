@@ -50,9 +50,11 @@ public class TelegramVerticle extends AbstractVerticle {
 			
 			if (handler.getMessage().getText().toLowerCase().contains("prototipo")){			
 				
-				bot.sendMessage(new SendMessage().setText("Nuestro prototipo hardware aún está en desarrollo, aunque ahora mismo el "
-						+ "desarrollo se encuentra paralizado porque no disponemos de los materiales necesarios :(\n\n"
-						+ "Pero pronto retomaremos el desarrollo :D").setChatId(handler.getMessage().getChatId()));
+				bot.sendMessage(new SendMessage().setText("Nuestro prototipo hardware está terminado :D\n"
+						+ "Ahora mismo se encuentra en fase de desarrollo, pero es totalmente capaz de realizar su acción principal "
+						+ "de una manera satisfactoria. Además, podemos controlarlo manualmente si queremos :D\n\n"
+						+ "Si quieres ver cómo va el desarrollo del mismo, puedes verlo en nuestro GitHub o en el siguiente vídeo: "
+						+ "https://youtu.be/Le7JS5TxZe4").setChatId(handler.getMessage().getChatId()));
 				
 			}
 			
