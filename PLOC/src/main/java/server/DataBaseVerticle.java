@@ -64,6 +64,7 @@ public class DataBaseVerticle extends AbstractVerticle{
 		//-----------------------------------------------------------------TABLA VALORES------------------------------------------------------------
 		
 		router.route("/api/valores").handler(BodyHandler.create());
+		router.route("/api/valores/*").handler(BodyHandler.create());
 		
 		router.get("/api/valores").handler(this::getAllValues);
 		router.get("/api/valores/:idSensor").handler(this::getValuesBySensorID);

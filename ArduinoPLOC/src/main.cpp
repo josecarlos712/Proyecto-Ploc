@@ -25,21 +25,26 @@ int idDron = 2; //Asignamos la ID del propio dron
 int idRuta = -1;//Como no sabe la ruta que tiene asignada, debe pedirla
 int idSensor = -1;//Como no sabe el sensor que tiene asignada, debe pedirla
 String ruta = "";//Ruta que seguirá nuestro pequeño
+String parkingPath = ""; //Ruta para salir del parking
+String estadoDron = "INACTIVO"; //Estado en el que se encuentra el Dron
+
+String estadoRuta = "NO ASIGNADA";
 
 char respondeBuffer[300];
 WiFiClient client;
 
-char auth[] = "token";
+char auth[] = "aecqKZwkTPVhiPiXw__P3IO7uDvz5qlr";
 char ssid[] = "PUERTOSURFIBRA869A";
-char pass[] = "contraseña";
+char pass[] = "A523869A";
 
 String SSID = "PUERTOSURFIBRA869A";
-String PASS = "contraseña";
+String PASS = "A523869A";
 
 String SERVER_IP = "192.168.100.115";
 int SERVER_PORT = 80;
 
 int manual = 0;
+int needActInfo = 0;
 
 int calculaDistancia();
 
@@ -54,14 +59,16 @@ void giroIzquierda();
 void giroDerecha();
 void pausa();
 
-void trazaRuta();
+void trazaRuta(String r);
 
 BLYNK_WRITE(V5)
 {
-  manual = param.asInt(); // assigning incoming value from pin V1 to a variable
-  // You can also use:
-  // String i = param.asStr();
-  // double d = param.asDouble();
+  manual = param.asInt(); // assigning incoming value from pin V5 to a variable
+}
+
+BLYNK_WRITE(V6)
+{
+  needActInfo = param.asInt(); // assigning incoming value from pin V6 to a variable
 }
 
 void setup() {
@@ -90,36 +97,56 @@ void setup() {
   Serial.println("Connected succesfuly");
   Serial.print("IP: ");
   Serial.println(WiFi.localIP());
+
+  //Solucitud de información adicional
+  obtenerInfo();
+
 }
 
 void loop() {
+
+  Blynk.run();
+
+  if(needActInfo){obtenerInfo(); estadoDron = "LISTO PARA ENRUTAR"; Serial.println("ACTUALIZADA INFORMACIÓN DE DRON"); } //Necesita actualizar la información
 
   if(manual != 1){
 
     digitalWrite(D5,LOW);
     pausa();
-    //Solucitud de información adicional
-    obtenerInfo();
-  
+    
     if(idRuta != -1){
-      //Pide la ruta correspondiente
-      obtenerRuta();
-      //Tratamiento de la ruta
-      trazaRuta();
+
+      if(estadoDron == "GARAJE"){
+        trazaRuta(parkingPath);
+        estadoDron = "LISTO PARA ENRUTAR";
+      }
+
+      if(estadoDron == "LISTO PARA ENRUTAR"){
+        //Pide la ruta correspondiente
+        obtenerRuta();
+        estadoDron = "EN RUTA";
+        //Tratamiento de la ruta
+        trazaRuta(ruta);
+        Serial.println("**********************************************************************************");
+        Serial.print("ESTADO DE DRON: ");
+        Serial.println(estadoDron);
+        Serial.println("**********************************************************************************");
+        Serial.print("RUTA ");
+        Serial.println(estadoRuta);
+        Serial.println("**********************************************************************************");
+      }
+
     }
 
-      ruta = "";
       delay(10000);
   }
 
-  if(calculaDistancia() < 20){
+  if(calculaDistancia() < 20 && !(RL == 1 && RR == 1 && FL == 0 && FR == 0)){
  
       ruta = "P";
       pausa();
 
   }
-
-    Blynk.run();
 
 }
 
@@ -152,10 +179,10 @@ void obtenerInfo(){
     Serial.println(F("Response:"));
     int pesoSoportado = doc[0]["pesoSoportado"].as<int>();
     int bateria = doc[0]["bateria"].as<int>();
-    String parkingPath = doc[0]["parkingPath"].as<char*>();
+    parkingPath = doc[0]["parkingPath"].as<char*>();
     idSensor = doc[0]["idSensor"].as<int>();
     idRuta = doc[0]["idRuta"].as<int>();
-    String estado = doc[0]["estado"].as<char*>();        
+    estadoDron = doc[0]["estado"].as<char*>();        
 
     Serial.println(idDron);
     Serial.println(pesoSoportado);
@@ -163,7 +190,7 @@ void obtenerInfo(){
     Serial.println(parkingPath);
     Serial.println(idSensor);
     Serial.println(idRuta);
-    Serial.println(estado);
+    Serial.println(estadoDron);
     
   }
 
@@ -208,25 +235,32 @@ void obtenerRuta(){
 void enviarValores(bool obs){
   if(WiFi.status() == WL_CONNECTED){
     HTTPClient http;
-    char payload[50] = "";
+    char payload[50];
 
-    http.begin(client, SERVER_IP, SERVER_PORT, "/api/sensores", true);
+    http.begin(client, SERVER_IP, SERVER_PORT, "/api/valores", false);
 
     //String payload = "{\"idValor\":0,\"timestamp\":" + timestamp + ",\"obs\":" + obs + ",\"idSensor\":" + idSensor + "}";
-    sprintf(payload, "{\"idValor\":0,\"timestamp\":%l,\"obs\":%d,\"idSensor\":%d}", timestamp, obs, idSensor);
+    http.addHeader("content-type", "application/json");
 
-    const size_t capacity = JSON_OBJECT_SIZE(9) + JSON_ARRAY_SIZE(2) + 60;
-    DynamicJsonDocument doc(capacity);
+    if(obs){
+      sprintf(payload, "{\"idValor\":0,\"timestamp\":%d,\"obs\":true,\"idSensor\":%d}", timestamp, idSensor);
+    }else{
+      sprintf(payload, "{\"idValor\":0,\"timestamp\":%d,\"obs\":false,\"idSensor\":%d}", timestamp, idSensor);
+    }
 
-    //serializeJson(doc,payload);
+    Serial.print("Json posteado: ");
+    //Serial.println(payload);
 
-    http.POST(payload);
+    int responseCode = http.POST(payload);
+    String response = http.getString();
+    Serial.println(response);
+    http.end();
     
   }
 
 }
 
-  void trazaRuta(){
+  void trazaRuta(String r){
 
   String rutaProcesada = "";
   String aux = "";
@@ -234,9 +268,9 @@ void enviarValores(bool obs){
   int i = 0;
   int j = 0;
   
-  for(i = 0; i <= ruta.length(); i++){
+  for(i = 0; i <= r.length(); i++){
 
-    if(ruta[i] == '-' || ruta[i] == ',' || ruta[i] == '\0'){
+    if(r[i] == '-' || r[i] == ',' || r[i] == '\0'){
        if(aux.length() > 1){
           for(j = 0; j < aux.toInt(); j++){
             rutaProcesada += aux[1];  
@@ -246,12 +280,12 @@ void enviarValores(bool obs){
         }
         aux = "";      
     }else{
-      aux += ruta[i]; 
+      aux += r[i]; 
     }
     Serial.print("La ruta procesada es: ");
     Serial.println(rutaProcesada); 
-    Serial.print("La ruta aux es: ");
-    Serial.println(aux);
+    //Serial.print("La ruta aux es: ");
+    //Serial.println(aux);
   }
 
   for(int i = 0; i < rutaProcesada.length(); i++){
@@ -273,19 +307,28 @@ void enviarValores(bool obs){
         pausa();
         break;
     }
+
     if(calculaDistancia() < 20){
 
+      pausa();
       enviarValores(true);
       rutaProcesada = "";
       ruta = "P";
+      estadoRuta = "INTERRUMPIDA POR COLISION";
+      estadoDron = "COLISIONADO :(";
+
+      return;
 
     }
-    enviarValores(false);
+    //enviarValores(false);
+    timestamp++;
     //delay(1500);  
   }
 
   pausa();
-  
+  estadoRuta = "COMPLETADA CON EXITO";
+  estadoDron = "LISTO PARA ENRUTAR";
+
   }
 
 void avanzar(){

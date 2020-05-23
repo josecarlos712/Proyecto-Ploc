@@ -246,6 +246,9 @@ Dentro del mismo, se puede ver que contamos con varias variables globales que po
 - **idRuta** la cual contiene el ID de la ruta que se le ha asignado al dron. Este ID deberá solicitarse al servidor mediante la función correspondiente, en este caso es la función **obtenerInfo()**, en la cual se obtiene la información del dron asociada a su ID mediante una petición GET a la API REST.
 - **idSensor** la cual contiene el ID del sensor que se le asocia al dron. Al igual que en el caso anterior, debe solicitarse previamente al servidor mediante la función **obtenerInfo()**.
 - **Ruta** la cual contiene el path de la ruta que se le ha asignado al dron. Para ello, una vez que disponemos del idRuta asignado a nuestro dron, se llama a la función **obtenerRuta()**, en la cual se obtiene la información del dron asociada a su idRuta mediante una petición GET a la API REST.
+- **ParkingPath** la cual contiene el path necesario para sacar al dron del garaje. Esta ruta solo se ejecutará en caso de que el dron se encuentre en el garaje y la obtendremos al realizar la función **obtenerInfo()**.
+- **EstadoDron** la cual informa del estado actual en el que se encuentra el dron, este estado puede abarcar desde en garaje hasta en ruta o colisionado. Se irá actualizando según cambie el estado del Dron.
+- **EstadoRuta** la cual informa del estado actual en el que se encuentra la ruta. Los estados pueden ser **NO ASIGNADA**, **EN PROCESO**, **INTERRUMPIDA** y **COMPLETADA**.
 
 ## FUNCIONES
 
@@ -265,12 +268,13 @@ Cada una de estas funciones se activan durante un tiempo, en concreto durante un
 
 ### CONEXIÓN CON LA BASE DE DATOS
 
-En el apartado de la conexión con la base de datos, ya se ha adelantado anteriormente que consiste en dos funciones principalmente, aunque luego aumentarán ya que debemos incorporar varias funcionalidades más. Estas dos funciones son las siguientes:
+En el apartado de la conexión con la base de datos, ya se ha adelantado anteriormente que disponemos de dos funciones principales para el tratamiento de las rutas y además, hemos incluido una función que nos permite informar a la base de datos en caso de colisión enviando el timestamp en el que se ha encontrado el obstáculo. Estas tres funciones son las siguientes:
 
 - **obtenerInfo()**: Esta función obtiene la información del dron asociada a su ID mediante una petición GET a la API REST. Esta información es la entrada entera correspondiente de la base de datos para ese dron. En ella podemos encontrar el estado de la batería, el estado actual del dron, las IDs que necesitamos...
 - **obtenerRuta()**: Esta función obtiene la información del dron asociada a su idRuta mediante una petición GET a la API REST. Esta información, al igual que en el caso anterior, contiene todas las columnas de la entrada correspondiente de dicha ruta en la base de datos. En ella podemos encontrar el path de la ruta y el tiempo que tarda en realizarse dicha ruta
+- **enviarValores()**: Esta función envía información a la base de datos sobre las colisiones, para ello, envía un Json que contiene el idSensor que tiene asignado, el timestamp en el que se ha producido la detección y el valor de la variable obs, la cual denota si hay un obstáculo o no.
 
-En ambos casos, solamente almacenaremos la información que realmente vayamos a utilizar, aunque si tenemos la placa enchufada al PC, podemos llegar a ver toda la información que estamos obteniendo.
+En las funciones de **obtenerInfo()** y **obtenerRuta()**, solamente almacenaremos la información que realmente vayamos a utilizar, aunque si tenemos la placa enchufada al PC, podemos llegar a ver toda la información que estamos obteniendo. 
 
 ### TRATAMIENTO DE LAS RUTAS
 
