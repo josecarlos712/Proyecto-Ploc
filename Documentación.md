@@ -11,9 +11,9 @@ En la primera iteración de nuestro proyecto (con fecha límite la fecha de la s
 
 # Links
 
-Chasis tanque - [Chasis de tanque Robot](https://es.aliexpress.com/item/4000449355642.html?spm=a2g0s.8937460.0.0.1b842e0enKKRRU)
-
 Placas de desarrollo - [Yizhet NodeMCU Lua Lolin V3](https://www.amazon.es/Yizhet-NodeMCU-ESP8266-Desarrollo-Internet/dp/B07XJWK5F4/ref=sr_1_4?__mk_es_ES=ÅMÅŽÕÑ&keywords=esp8266&qid=1581681743&sr=8-4)
+
+Hemos preparado un video de presentación del proyecto en el cual puede verse el correcto funcionamiento de un dron que hemos creado nosotros y de los diferentes servidores. Dicho video puede pedirse a nuestro Bot de Telegram  **@PlocBot** o haciendo click [aquí](https://youtu.be/Le7JS5TxZe4)
 
 # API REST
 
@@ -228,10 +228,22 @@ El contenido del Json que se envía en el mensaje es el siguiente:
 
 ## PATHS
 
-Este canal se usa para asignar a los drones una ruta a seguir, de forma que se les enviará un Json dirigido a un dron en específico con el siguiente contenido:
+Este canal se usa para poder dar la orden al dron de que renueve su información de ruta. Por defecto, el dron sale del garaje y se queda esperando instrucciones, en ese momento, debemos enviar un mensaje por este canal con el idDron que queremos que actualice su información de ruta. De la misma forma, cuando un dron termina de realizar su ruta, se queda esperando a que le demos una nueva orden, por lo que si queremos que vuelva a actualizar su información de ruta, debemos enviar un mensaje por este canal.
+
+Los mensajes que se envían son con formato Json y su contenido es el **idDron** del cual queremos que actualice su información de ruta
 
 ~~~json
-{"idDron": Dron al que se le asigna la ruta, "idRuta": Identificador de la ruta que se encuentra en la base de datos y la cual se asignará al dron, "Path": Ruta asignada al robot}
+{"idDron": Dron al que se le asigna la ruta}
+~~~
+
+## STOP
+
+Este canal se usa para detener un dron de una forma rápida. Cuando un dron queda detenido, se queda esperando ruta, por lo que podemos decirle que actualice la ruta o que simplemente continúe parado.
+
+Los mensajes que se envían son con formato Json y su contenido es el **idDron** del cual queremos que se pare
+
+~~~json
+{"idDron": Dron al que se le asigna la ruta}
 ~~~
 
 # PROTOTIPO HARDWARE
@@ -300,7 +312,7 @@ Hemos incluido un sistema de control manual usando la aplicación y las librerí
 
 # TELEGRAM
 
-Hemos creado un bot de Telegram, el cual informa del estado actual del proyecto y de cómo se encuentra el desarrollo del mismo. El bot se llama: @PlocBot
+Hemos creado un bot de Telegram el cual nos ayuda a gestionar información sobre los drones y nos permite usar los canales de comunicación MQTT de una forma muy sencilla. El nombre del bot es: **@PlocBot**
 
-El código del bot se encuentra dentro del proyecto ya que hemos usado vertx para crearlo.
+El bot incorpora varias funciones, como la de informar sobre el estado actual del proyecto, mostrando información sobre el prototipo hardware, la base de datos, la API REST... Pero además, podemos realizar peticiones a la API REST para comprobar su correcto funcionamiento y además nos permite controlar los drones usando los canales MQTT que hasta ahora tenemos implementados y se encuentran funcionando. Para poder hacer esto, debemos disponer del usuario y la contraseñas necesarios para poder acceder al servidor MQTT.
 

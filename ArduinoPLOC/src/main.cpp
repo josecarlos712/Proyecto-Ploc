@@ -7,6 +7,7 @@
 #include <SoftwareSerial.h>
 #include <stdlib.h>
 #include <BlynkSimpleEsp8266.h>
+#include <PubSubClient.h>
 
 const int RL = D0;
 const int FL = D1;
@@ -21,10 +22,11 @@ long timestamp = 0;
 int tiempo = 0;
 int distancia = 0;
 
-int idDron = 2; //Asignamos la ID del propio dron
+int idDron = 1; //Asignamos la ID del propio dron
 int idRuta = -1;//Como no sabe la ruta que tiene asignada, debe pedirla
 int idSensor = -1;//Como no sabe el sensor que tiene asignada, debe pedirla
 String ruta = "";//Ruta que seguirá nuestro pequeño
+String rutaProcesada = "";
 String parkingPath = ""; //Ruta para salir del parking
 String estadoDron = "INACTIVO"; //Estado en el que se encuentra el Dron
 
@@ -33,18 +35,25 @@ String estadoRuta = "NO ASIGNADA";
 char respondeBuffer[300];
 WiFiClient client;
 
-char auth[] = "aecqKZwkTPVhiPiXw__P3IO7uDvz5qlr";
+char auth[] = "";
 char ssid[] = "PUERTOSURFIBRA869A";
-char pass[] = "A523869A";
+char pass[] = "";
 
 String SSID = "PUERTOSURFIBRA869A";
-String PASS = "A523869A";
+String PASS = "";
 
 String SERVER_IP = "192.168.100.115";
 int SERVER_PORT = 80;
 
 int manual = 0;
 int needActInfo = 0;
+
+//MQTT
+String USERNAME = "Dron1";
+char* SERVER_IP_MQTT  =  "192.168.100.115";
+int MQTT_PORT = 1885;
+
+PubSubClient clienteMQTT(client);
 
 int calculaDistancia();
 
@@ -60,6 +69,8 @@ void giroDerecha();
 void pausa();
 
 void trazaRuta(String r);
+
+void callback(char* topic, byte* payload, unsigned int length); //Función en la que se hará el tratamiento del mensaje MQTT
 
 BLYNK_WRITE(V5)
 {
@@ -89,6 +100,7 @@ void setup() {
 
   Blynk.begin(auth,ssid,pass);
 
+  //Conexión wifi
   Serial.println("Connecting...");
   while(WiFi.status() != WL_CONNECTED){
     delay(500);
@@ -98,6 +110,18 @@ void setup() {
   Serial.print("IP: ");
   Serial.println(WiFi.localIP());
 
+  //MQTT
+  clienteMQTT.setServer(SERVER_IP_MQTT,MQTT_PORT);
+  clienteMQTT.setCallback(callback);
+  
+  while(!clienteMQTT.connect("Dron1","mqttbroker","mqttbrokerpass")){
+    Serial.println("Coneccting to MQTT");
+  }
+  Serial.println("Conectado al servidor MQTT");
+
+  clienteMQTT.publish("stop", "Dron conectado");
+  clienteMQTT.subscribe("stop");
+
   //Solucitud de información adicional
   obtenerInfo();
 
@@ -106,6 +130,9 @@ void setup() {
 void loop() {
 
   Blynk.run();
+  clienteMQTT.loop();
+
+  clienteMQTT.publish("stop", "Dron conectado");
 
   if(needActInfo){obtenerInfo(); estadoDron = "LISTO PARA ENRUTAR"; Serial.println("ACTUALIZADA INFORMACIÓN DE DRON"); } //Necesita actualizar la información
 
@@ -137,8 +164,7 @@ void loop() {
       }
 
     }
-
-      delay(10000);
+      delay(1000);
   }
 
   if(calculaDistancia() < 20 && !(RL == 1 && RR == 1 && FL == 0 && FR == 0)){
@@ -262,7 +288,7 @@ void enviarValores(bool obs){
 
   void trazaRuta(String r){
 
-  String rutaProcesada = "";
+  rutaProcesada = "";
   String aux = "";
   
   int i = 0;
@@ -322,12 +348,22 @@ void enviarValores(bool obs){
     }
     //enviarValores(false);
     timestamp++;
+    Blynk.run();
+    clienteMQTT.loop();
+    if(manual){ 
+      pausa(); 
+      ruta = "P"; 
+      rutaProcesada = "";
+
+      estadoRuta = "INTERRUMPIDA POR USUARIO";
+      estadoDron = "CONTROL MANUAL ACTIVADO";   
+    }
     //delay(1500);  
   }
 
   pausa();
   estadoRuta = "COMPLETADA CON EXITO";
-  estadoDron = "LISTO PARA ENRUTAR";
+  estadoDron = "ESPERANDO INSTRUCCIONES";
 
   }
 
@@ -399,5 +435,50 @@ int calculaDistancia(){
   delay(100);
 
   return distancia;
+
+}
+
+void callback(char* topic, byte* payload, unsigned int length) {
+
+  String body = "";
+
+  for (int i = 0; i < length; i++) {
+    body += (char)payload[i];
+  }
+  
+  const size_t capacity = JSON_OBJECT_SIZE(3) + JSON_ARRAY_SIZE(2) + 60;
+  DynamicJsonDocument doc(capacity);
+
+  DeserializationError error = deserializeJson(doc, body);
+  if(error){
+      Serial.print("Deserialize Error: ");
+      Serial.println(error.c_str());
+      return;
+  }
+
+  Serial.print("Mensaje recibido desde el canal: ");
+  Serial.println(topic);
+
+  if(topic == "stop"){
+
+    Serial.println(F("Response:"));
+    String nuevaRuta = doc[0]["path"].as<char*>(); //Se envía una nueva ruta a seguir por el Dron
+    int dron = doc["idDron"].as<int>();
+
+    Serial.println(nuevaRuta);
+    Serial.println(dron);
+
+    int dron = 1;
+
+    if(dron == idDron){ 
+      pausa(); 
+      ruta = "P";
+      rutaProcesada = "P"; 
+
+      estadoRuta = "INTERRUMPIDA POR USUARIO";
+      estadoDron = "CABREADO PORQUE LE HAN PARADO LA RUTA AL POBRE";  
+    }
+
+  }
 
 }

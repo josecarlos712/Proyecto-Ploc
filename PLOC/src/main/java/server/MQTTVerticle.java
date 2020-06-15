@@ -21,13 +21,14 @@ public class MQTTVerticle extends AbstractVerticle{
 	//Canales
 	public static final String TOPIC_SENSOR = "sensor";
 	public static final String TOPIC_PATH = "path";
+	public static final String TOPIC_STOP = "stop";
 	
 	private static final SetMultimap<String, MqttEndpoint> clients = LinkedHashMultimap.create();
 	
 	@Override
 	public void start(Promise<Void> future) {
 		
-		MqttServerOptions options = new MqttServerOptions().setPort(8086).setClientAuth(ClientAuth.REQUIRED);
+		MqttServerOptions options = new MqttServerOptions().setPort(1885).setClientAuth(ClientAuth.REQUIRED);
 		MqttServer mqttServer = MqttServer.create(vertx,options);
 		
 		mqttServer.endpointHandler(endpoint -> {
